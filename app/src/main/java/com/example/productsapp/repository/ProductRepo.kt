@@ -17,8 +17,7 @@ class ProductRepo(
 
     suspend fun getProducts(){
         val result = productService.getProducts()
-        if (result.isSuccessful && result?.body() != null){
-            Log.d("TAG", "getProducts: ${result.body()}")
+        if (result.isSuccessful && result.body() != null){
             productsLiveData.postValue(Response.Success(result.body()))
         } else {
             productsLiveData.postValue(Response.Error("Error 404: Data not found"))
