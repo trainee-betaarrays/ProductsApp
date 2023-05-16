@@ -1,6 +1,7 @@
 package com.example.productsapp.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.productsapp.model.ApiResponse
@@ -17,6 +18,7 @@ class ProductRepo(
     suspend fun getProducts(){
         val result = productService.getProducts()
         if (result.isSuccessful && result?.body() != null){
+            Log.d("TAG", "getProducts: ${result.body()}")
             productsLiveData.postValue(Response.Success(result.body()))
         } else {
             productsLiveData.postValue(Response.Error("Error 404: Data not found"))
