@@ -9,10 +9,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.productsapp.api.RetrofitHelper
 import com.example.productsapp.databinding.ActivityMainBinding
+import com.example.productsapp.model.Product
 import com.example.productsapp.repository.ProductRepo
 import com.example.productsapp.service.ProductService
+import com.example.productsapp.ui.adapter.ProductsAdapter
 import com.example.productsapp.viewmodel.ProductsViewModel
 import com.example.productsapp.viewmodel.ProductsViewModelFactory
 
@@ -21,14 +25,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var productsRepo: ProductRepo
     private lateinit var productsViewModel: ProductsViewModel
+    private lateinit var productsRv: RecyclerView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         initialize()
 
-        productsViewModel.products.observe(this, Observer {
-            Log.d("TAG", "onCreate: ${it.data}")
-        })
+        productsViewModel.products.observe(this) {
+            val adapter = it.data?.let { it1 -> ProductsAdapter(this, it1.products) }
+            productsRv.adapter = adapter
+        }
     }
 
     private fun initialize() {
@@ -36,5 +43,7 @@ class MainActivity : AppCompatActivity() {
         productsRepo = ProductRepo(productService, applicationContext)
         productsViewModel = ViewModelProvider(this, ProductsViewModelFactory(productsRepo))[ProductsViewModel::class.java]
         productsViewModel.fetchProducts();
+        productsRv = binding.productRv
+        binding.productRv.layoutManager = LinearLayoutManager(this)
     }
 }

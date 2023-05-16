@@ -2,4 +2,8 @@
     <string name="app_name">ProductsApp</string>
     <string name="product_name">Product Name</string>
     <string name="product_description">Product Description</string>
+    <string name="product_brand">Product brand</string>
+    <string name="product_price">Product price</string>
+    <string name="product_stock">Product Stock</string>
+    <string name="product_rating">Product Rating</string>
 </resources>
