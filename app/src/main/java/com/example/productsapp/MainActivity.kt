@@ -17,10 +17,11 @@ import com.example.productsapp.model.Product
 import com.example.productsapp.repository.ProductRepo
 import com.example.productsapp.service.ProductService
 import com.example.productsapp.ui.adapter.ProductsAdapter
+import com.example.productsapp.ui.adapter.RecyclerViewClickListener
 import com.example.productsapp.viewmodel.ProductsViewModel
 import com.example.productsapp.viewmodel.ProductsViewModelFactory
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RecyclerViewClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var productsRepo: ProductRepo
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         productsViewModel.products.observe(this) {
             val adapter = it.data?.let { it1 -> ProductsAdapter(this, it1.products) }
+            adapter?.setOnItemClickListener(this)
             productsRv.adapter = adapter
         }
     }
@@ -45,5 +47,9 @@ class MainActivity : AppCompatActivity() {
         productsViewModel.fetchProducts();
         productsRv = binding.productRv
         binding.productRv.layoutManager = LinearLayoutManager(this)
+    }
+
+    override fun recyclerViewListClicked(id: Int) {
+        Toast.makeText(this, "$id", Toast.LENGTH_SHORT).show()
     }
 }
