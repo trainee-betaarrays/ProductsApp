@@ -1,20 +1,16 @@
 package com.example.productsapp
 
-import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.productsapp.api.RetrofitHelper
 import com.example.productsapp.databinding.ActivityMainBinding
-import com.example.productsapp.model.Product
 import com.example.productsapp.repository.ProductRepo
+import com.example.productsapp.repository.Response
 import com.example.productsapp.service.ProductService
 import com.example.productsapp.ui.adapter.ProductsAdapter
 import com.example.productsapp.ui.adapter.RecyclerViewClickListener
@@ -32,11 +28,28 @@ class MainActivity : AppCompatActivity(), RecyclerViewClickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initialize()
+        setUi()
+    }
 
-        productsViewModel.products.observe(this) {
-            val adapter = it.data?.let { it1 -> ProductsAdapter(this, it1.products) }
-            adapter?.setOnItemClickListener(this)
-            productsRv.adapter = adapter
+    private fun setUi() {
+        productsViewModel.products.observe(this) { fetchedData ->
+            when (fetchedData){
+                is Response.Loading -> { binding.progressBar.visibility = View.VISIBLE }
+                is Response.Error -> {
+                    binding.noInternetTV.text = fetchedData.errorMessage
+                    binding.noInternetTV.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
+                }
+                is Response.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.noInternetTV.visibility = View.GONE
+                    fetchedData.data?.let {
+                        val adapter = ProductsAdapter(this, fetchedData.data.products)
+                        adapter.setOnItemClickListener(this)
+                        productsRv.adapter = adapter
+                    }
+                }
+            }
         }
     }
 
